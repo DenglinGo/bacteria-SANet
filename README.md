@@ -12,3 +12,4 @@ Source code and demos for "Scale-adaptive Deep Model for Bacterial Raman Spectra
 * tqdm 4.46.1
 
 # Model
+![Scale-adaptive-model](https://github.com/DenglinGo/bacteria-SANet/blob/main/model.pdf)
