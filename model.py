@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+#capture and combine multi-scale Raman features
 class MultiScaleBlock(nn.Module):
     def __init__(self,inc,ouc,branchs=6,stride=1,reduction=16):
         super(MultiScaleBlock,self).__init__()
@@ -38,7 +39,7 @@ class MultiScaleBlock(nn.Module):
 class ScaleAdaptiveNet(nn.Module):
     def __init__(self,num_classes=30):
         super(ScaleAdaptiveNet, self).__init__()
-        self.feat = nn.Sequential(
+        self.feature = nn.Sequential(
             MultiScaleBlock(1,16,stride=2),  #500
             MultiScaleBlock(16,32,stride=2), #250
             MultiScaleBlock(32,64,stride=2), #125
@@ -50,13 +51,15 @@ class ScaleAdaptiveNet(nn.Module):
         )
         self.classify = nn.Linear(1024,num_classes)
     def forward(self,x):
-        out = self.feat(x)
+        out = self.feature(x)
         out = out.flatten(start_dim=1)
         out = self.classify(out)
         return out
+
+    # get Grad-CAMs of given spectra and targets
     def getgradCAM(self,x,target):
         self.eval()
-        f = self.feat(x).detach()
+        f = self.feature(x).detach()
         f.requires_grad_()
         out = f.flatten(start_dim=1)
         out = self.classify(out)
