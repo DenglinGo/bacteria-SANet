@@ -13,4 +13,4 @@ Source code and demos for "Scale-adaptive Deep Model for Bacterial Raman Spectra
 
 # Model
 ![Scale-adaptive-model](https://github.com/DenglinGo/bacteria-SANet/blob/main/model.png)
-The detail of the Multi-scale Block and overrall model can be found in model.py
+The detail of the Multi-scale Block and model can be found in [model.py](https://github.com/DenglinGo/bacteria-SANet/blob/main/model.py)
