@@ -66,13 +66,14 @@ class Engine:
     def train(fold,epoch,data_loader,lossF,model,optimizer,device,sheduler,accumulation_steps=1,fp16=True,sheduler_type='ReduceLROnPlateau',binary=False):
         losses = AverageMeter()
         accuracies = AverageMeter()
-        final_predictions = []
         model.train()
         scalar = torch.cuda.amp.GradScaler()
         bar = tqdm(data_loader)
         for batch,(data,target) in enumerate(bar):
             iter = len(bar)
             data, target = data.to(device), target.to(device)
+            batch_size = data.size(0)
+
             if binary:
                 target = target.unsqueeze(1)
             if batch % accumulation_steps == 0:
@@ -102,9 +103,8 @@ class Engine:
             else:
                 predictions = torch.argmax(out,dim=1).view(-1).detach().cpu().numpy()
             accuracy = (predictions == target.detach().cpu().numpy()).mean()
-            final_predictions.append(predictions)
-            losses.update(loss.item(),data_loader.batch_size)
-            accuracies.update(accuracy.item(),data_loader.batch_size)
+            losses.update(loss.item(),batch_size)
+            accuracies.update(accuracy.item(),batch_size)
             bar.set_description(
                     "Fold%d, Epoch%d : Average train loss is %.6f, the accuracy rate of trainset is %.4f " % (fold,epoch,losses.avg,accuracies.avg))
 
@@ -117,6 +117,7 @@ class Engine:
         bar = tqdm(data_loader)
         with torch.no_grad():
             for i,(data,target) in enumerate(bar):
+                batch_size = data.size(0)
                 data,target = data.to(device),target.to(device)
                 if binary:
 
@@ -130,8 +131,8 @@ class Engine:
                 else:
                     predictions = torch.argmax(out, dim=1).view(-1).detach().cpu().numpy()
                 accuracy = (predictions == target.detach().cpu().numpy()).mean()
-                losses.update(loss.item(), data_loader.batch_size)
-                accuracies.update(accuracy.item(),data_loader.batch_size)
+                losses.update(loss.item(), batch_size)
+                accuracies.update(accuracy.item(),batch_size)
                 bar.set_description(
                     "Fold%d, Epoch%d,: Average validate loss is %.6f, the accuracy rate of valset is %.4f " % (fold,epoch,losses.avg, accuracies.avg))
 
@@ -147,7 +148,7 @@ class Engine:
         with torch.no_grad():
             for i,(data,target) in enumerate(bar):
                 data,target = data.to(device),target.to(device)
-
+                batch_size = data.size(0)
                 if binary:
                     target = target.unsqueeze(1)
                 out = model(data)
@@ -163,8 +164,8 @@ class Engine:
                 target = target.detach().cpu().numpy()
                 accuracy = (predictions == target).mean()
 
-                losses.update(loss.item(), data_loader.batch_size)
-                accuracies.update(accuracy.item(),data_loader.batch_size)
+                losses.update(loss.item(), batch_size)
+                accuracies.update(accuracy.item(),batch_size)
                 bar.set_description(
                     "Average test loss is %.6f, the accuracy rate of testset is %.4f " % (losses.avg, accuracies.avg))
                 predicticted += predictions.tolist()
