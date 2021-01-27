@@ -1,7 +1,7 @@
-
+#Order to plot
 ORDER = [16, 17, 14, 18, 15, 20, 21, 24, 23, 26, 27, 28, 29, 25, 6, 7, 5, 3, 4,
          9, 10, 2, 8, 11, 22, 19, 12, 13, 0, 1]
-
+#Isolate label
 STRAINS = {}
 STRAINS[0] = "C. albicans"
 STRAINS[1] = "C. glabrata"
@@ -34,6 +34,7 @@ STRAINS[27] = "Group B Strep."
 STRAINS[28] = "Group C Strep."
 STRAINS[29] = "Group G Strep."
 
+#Assigin isolate to treatment Groups
 ATCC_GROUPINGS = {3: 0,
                   4: 0,
                   9: 0,
